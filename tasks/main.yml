@@ -1,0 +1,62 @@
+---
+- name: "Ensure that {{ tmp_directory }} directory exists"
+  ansible.builtin.file:
+    path: "{{ tmp_directory }}"
+    state: "directory"
+    owner: "{{ file_owner }}"
+    group: "{{ file_group }}"
+    mode: "{{ directory_mode }}"
+
+- name: "Ensure that Scap Security Guide package is installed for RedHat OS family"
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+  ansible.builtin.package:
+    name: "{{ scap_package_name['os_family'] }}"
+    state: "latest"
+    update_cache: true
+    lock_timeout: 300
+    use: "{{ 'dnf' if ansible_facts['distribution'] == 'Amazon' and ansible_facts['distribution_major_version'] == '2023' else 'auto' }}"
+
+- name: "Ensure that Scap Security content is made available to managed node for Debian OS family"
+  when:
+    - ansible_facts['os_family'] == "Debian"
+  block:
+    - name: "Ensure that Scap Security Guide content is downloaded for Debian OS family"
+      ansible.builtin.get_url:
+        url: "{{ scap_content_url }}"
+        dest: "{{ tmp_directory }}/{{ scap_content_file }}"
+        owner: "{{ file_owner }}"
+        group: "{{ file_group }}"
+        mode: "{{ file_mode }}"
+
+    - name: "Ensure that Scap Security Guide content is extracted for Debian OS family"
+      ansible.builtin.unarchive:
+        src: "{{ tmp_directory }}/{{ scap_content_file }}"
+        dest: "{{ tmp_directory }}/"
+        remote_src: true
+        extra_opts: [-q]
+
+- name: "Ensure that the remediation script is executed"
+  ansible.builtin.shell:
+    cmd: |
+      {{ remediation_action[ansible_facts['os_family']][ansible_facts['distribution_major_version']] }}
+
+- name: "Ensure that housekeeping is completed"
+  block:
+    - name: "Ensure that Scap Security package is removed for RedHat OS family"
+      when:
+        - ansible_facts['os_family'] == "RedHat"
+      ansible.builtin.package:
+        name: "{{ scap_package_name['os_family'] }}"
+        state: "absent"
+        update_cache: true
+        lock_timeout: 300
+        use: "{{ 'dnf' if ansible_facts['distribution'] == 'Amazon' and ansible_facts['distribution_major_version'] == '2023' else 'auto' }}"
+
+    - name: "Ensure that Scap Security content is removed for Debian OS family"
+      when:
+        - ansible_facts['os_family'] == "Debian"
+      ansible.builtin.file:
+        path: "{{ tmp_directory }}"
+        state: "absent"
+...
