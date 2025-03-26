@@ -1,0 +1,34 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: "hakkutu-en"
+  description: "CIS Benchmark Server Level  2 hardening"
+  license: "license (MIT)"
+
+  min_ansible_version: "[core 2.16.14]"
+
+  platforms:
+    - name: "EL"
+      versions:
+        - "8"
+        - "9"
+
+    - name: "Amazon Linux"
+      versions:
+        - "2"
+        - "2023"
+
+    - name: "Ubuntu"
+      versions:
+        - "focal"
+        - "jammy"
+
+  galaxy_tags:
+    - cis
+    - security
+    - hardening
+    - benchmark
+    - compliance
+    - openscap
+...
