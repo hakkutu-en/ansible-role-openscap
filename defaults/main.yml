@@ -6,7 +6,7 @@ directory_mode: "0755"
 file_mode: "0644"
 
 # Temporary directory for storing content
-tmp_directory: "/tmp/cis-benchmark"
+tmp_directory: "/var/tmp/cis-benchmark"
 
 # Scap Security Guide content/package details
 scap_package_name:
@@ -20,11 +20,6 @@ scap_content_url: "https://github.com/ComplianceAsCode/content/releases/download
 sudoers_base_directory: "/etc/sudoers.d"
 sudoers_filename: "90-cloud-init-users"
 platform_sudo_user: "ec2-user"
-remediation_sudoers: |
-  chmod +w {{ sudoers_base_directory }}/{{ sudoers_filename }}
-  sed -i 's/^# {{ platform_sudo_user }}/{{ platform_sudo_user }}/' {{ sudoers_base_directory }}/{{ sudoers_filename }}
-  chmod -w {{ sudoers_base_directory }}/{{ sudoers_filename }}
-
 scap_execution_parameters:
   RedHat:
     content_base_directory: "/usr/share/scap-security-guide/ansible"
