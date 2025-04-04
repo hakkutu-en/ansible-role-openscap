@@ -43,23 +43,34 @@
     group: "{{ file_group }}"
     mode: "{{ file_mode }}"
 
-- name: Ensure that the remediation playbook is executed
-  register: playbook_run_output
-  ansible.builtin.shell:
+- name: Ensure that Ansible collection requirements file is copied
+  ansible.builtin.copy:
+    src: "requirements/{{ ansible_facts['distribution'] }}_{{ ansible_facts['distribution_major_version'] }}.yml"
+    dest: "{{ tmp_directory }}/collections_requirements.yml"
+    owner: "{{ file_owner }}"
+    group: "{{ file_group }}"
+    mode: "{{ file_mode }}"
+
+- name: Ensure that ansible-core is installed in the virtual environment
+  ansible.builtin.pip:
+    name: "ansible-core"
+    state: "latest"
+    virtualenv: "{{ tmp_directory }}/openscap"
+    virtualenv_command: "python3 -m venv"
+
+- name: Ensure that the needed Ansible collections are installed
+  ansible.builtin.command:
+    chdir: "{{ tmp_directory }}"
     cmd: |
-      cd {{ tmp_directory }}
-      python3 -m venv openscap
-      . openscap/bin/activate
-      pip3 install --upgrade pip
-      pip3 install ansible-core
+      . {{ tmp_directory }}/openscap/bin/activate
+      ansible-galaxy collection install -r collections_requirements.yml
 
-      # Amazon Linux 2023, RHEL 9, RHEL 8
-      # The following collection is required for ini_file module
-      #ansible-galaxy collection install community.general
-      # RHEL 9, RHEL 8, Ubuntu 24, Ubuntu 22
-      # The following collection is required for the sysctl module
-      ansible-galaxy collection install ansible.posix
-
+- name: Ensure that the scap playbook is executed
+  register: playbook_run_output
+  ansible.builtin.command:
+    chdir: "{{ tmp_directory }}"
+    cmd: |
+      . {{ tmp_directory }}/openscap/bin/activate
       ansible-playbook -i localhost, -c local {{ scap_execution_parameters[ansible_facts['distribution']]['content_base_directory'] }}/{{ scap_execution_parameters[ansible_facts['distribution']]['playbook_name'][ansible_facts['distribution_major_version']] }}
 
 - name: Display the output of the remediation script
