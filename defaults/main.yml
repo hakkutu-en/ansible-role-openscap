@@ -16,7 +16,7 @@ scap_content_version: "0.1.76"
 scap_content_file: "scap-security-guide-{{ scap_content_version }}.zip"
 scap_content_url: "https://github.com/ComplianceAsCode/content/releases/download/v{{ scap_content_version}}/{{ scap_content_file }}"
 
-# Script execution parameters
+# Playbook run parameters
 sudoers_base_directory: "/etc/sudoers.d"
 sudoers_filename: "90-cloud-init-users"
 platform_sudo_user: "ec2-user"
@@ -33,7 +33,6 @@ scap_execution_parameters:
   Ubuntu:
     content_base_directory: "{{ tmp_directory }}/{{ scap_content_file | splitext | first }}/ansible"
     playbook_name:
-      "20": "ubuntu2004-script-cis_level2_server.sh"
-      "22": "ubuntu2204-script-cis_level2_server.sh"
-      "24": "ubuntu2404-script-cis_level2_server.sh"
+      "22": "ubuntu2204-playbook-cis_level2_server.yml"
+      "24": "ubuntu2404-playbook-cis_level2_server.yml"
 ...
