@@ -53,7 +53,11 @@ To use the role, include the following task in your playbook:
 
 ## Role Variables
 
-TBC
+This role has multiple variables, the defaults variables are found at **[`defaults/main.yml`](/defaults/main.yml)**. See below variables and their descriptions:
+
+|Name|Description|
+|----|-----------|
+|||
 
 ## Dependencies
 
