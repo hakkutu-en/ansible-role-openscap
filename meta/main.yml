@@ -16,13 +16,12 @@ galaxy_info:
 
     - name: "Amazon Linux"
       versions:
-        - "2"
         - "2023"
 
     - name: "Ubuntu"
       versions:
-        - "focal"
         - "jammy"
+        - "noble"
 
   galaxy_tags:
     - cis
