@@ -40,7 +40,6 @@
             to_port: 22
             cidr_ip: "0.0.0.0/0"
 
-    # Set metadata on the below --- do not forget
     - name: Ensure that instances are created
       loop: "{{ molecule_yml.platforms }}"
       register: server
@@ -54,34 +53,30 @@
             ebs:
               volume_size: "{{ item.ebs_volume_size | default(30) }}"
               delete_on_termination: true
-        region: "{{ item.aws_region }}"
+        region: "{{ aws_region }}"
+        metadata_options:
+          http_endpoint: "enabled"
+          http_tokens: "required"
+          http_put_response_hop_limit: 2
         tags:
           Name: "{{ item.name }}"
           DefaultUser: "{{ item.ssh_username }}" # will fix later
 
-    # Will revisit this verification later
-    # - name: Retrieve information for instances
-    #   loop: "{{ molecule_yml.platforms }}"
-    #   register: ec2_instance_info
-    #   until: "item.instances[0].public_ip_address is defined and item.instances[0].private_ip_address is defined"
-    #   retries: 5
-    #   delay: 5
-    #   amazon.aws.ec2_instance_info:
-    #     region: "{{ region }}"
-    #     filters:
-    #       tag:Name: "{{ item.name }}"
-
-    #   until: ec2_instance_info.instances[0].public_ip_address is defined or ec2_instance_info.instances[0].private_ip_address is defined
-    #   retries: 10
-    #   delay: 15
-
-    - name: WIll delete when above is fixed
-      ansible.builtin.pause:
-        minutes: 2
+    - name: Retrieve information for instances
+      loop: "{{ server.results }}"
+      register: ec2_instance_info
+      until: >
+        ec2_instance_info.instances[0].public_ip_address is defined and
+        ec2_instance_info.instances[0].private_ip_address is defined
+      retries: 20
+      delay: 15
+      amazon.aws.ec2_instance_info:
+        region: "{{ aws_region }}"
+        filters:
+          tag:Name: "afs1-hakkutu-dev-ansible-role-openscap-*"
+          instance-state-name: ["pending", "running"]
 
     - name: Create instance config
-      when:
-        - server.changed | default(false) | bool
       block:
         - name: Populate instance config dict
           loop: "{{ server.results }}"
