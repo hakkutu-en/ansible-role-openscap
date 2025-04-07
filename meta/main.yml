@@ -3,6 +3,7 @@ dependencies: []
 
 galaxy_info:
   author: "hakkutu-en"
+  role_name: "ansible_role_openscap"
   description: "CIS Benchmark Server Level  2 hardening"
   license: "license (MIT)"
 
