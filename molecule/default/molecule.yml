@@ -2,16 +2,18 @@
 driver:
   name: default
 platforms:
-  - name: "afs1-hakkutu-dev-ansible-role-openscap-rhel-8"
-    image_id: "ami-025118c9cf7ae365b"
-    instance_type: "t3.medium"
-    ebs_device_name: "/dev/sda1"
-    ebs_volume_size: 30
-    ssh_username: "ec2-user"
+  # Issues with the AMI used
+  # Will implement tests late
+  # - name: "afs1-hakkutu-dev-ansible-role-openscap-rhel-8"
+  #   image_id: "ami-025118c9cf7ae365b"
+  #   instance_type: "t3.medium"
+  #   ebs_device_name: "/dev/sda1"
+  #   ebs_volume_size: 30
+  #   ssh_username: "ec2-user"
 
   - name: "afs1-hakkutu-dev-ansible-role-openscap-rhel-9"
     image_id: "ami-0d117e94e5cb4d9a8"
-    instance_type: "t3.micro"
+    instance_type: "t3.medium"
     ebs_device_name: "/dev/sda1"
     ebs_volume_size: 30
     ssh_username: "ec2-user"
