@@ -59,18 +59,18 @@
     virtualenv_command: "python3 -m venv"
 
 - name: Ensure that the needed Ansible collections are installed
-  ansible.builtin.command:
+  ansible.builtin.shell:
     chdir: "{{ tmp_directory }}"
     cmd: |
-      . {{ tmp_directory }}/openscap/bin/activate
+      . openscap/bin/activate
       ansible-galaxy collection install -r collections_requirements.yml
 
 - name: Ensure that the scap playbook is executed
   register: playbook_run_output
-  ansible.builtin.command:
+  ansible.builtin.shell:
     chdir: "{{ tmp_directory }}"
     cmd: |
-      . {{ tmp_directory }}/openscap/bin/activate
+      . openscap/bin/activate
       ansible-playbook -i localhost, -c local {{ scap_execution_parameters[ansible_facts['distribution']]['content_base_directory'] }}/{{ scap_execution_parameters[ansible_facts['distribution']]['playbook_name'][ansible_facts['distribution_major_version']] }}
 
 - name: Display the output of the remediation script
