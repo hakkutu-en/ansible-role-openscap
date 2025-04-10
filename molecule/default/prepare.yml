@@ -14,7 +14,7 @@
 
     - name: Ensure that python3-venv is installed for Ubuntu distribution
       when:
-        - ansible_facts['distribution'] == 'Ubuntu'
+        - ansible_facts['distribution'] == "Ubuntu"
       ansible.builtin.package:
         name: "python3-venv"
         state: present
