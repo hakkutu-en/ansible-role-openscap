@@ -19,7 +19,6 @@ scap_content_url: "https://github.com/ComplianceAsCode/content/releases/download
 # Playbook run parameters
 sudoers_base_directory: "/etc/sudoers.d"
 sudoers_filename: "90-cloud-init-users"
-platform_sudo_user: "ec2-user"
 scap_execution_parameters:
   RedHat:
     content_base_directory: "/usr/share/scap-security-guide/ansible"
