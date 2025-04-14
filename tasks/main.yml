@@ -80,22 +80,4 @@
 - name: Display the output of the remediation script
   ansible.builtin.debug:
     var: playbook_run_output
-
-- name: Ensure that housekeeping is completed
-  block:
-    - name: Ensure that Scap Security package is removed
-      when:
-        - ansible_facts['distribution'] == "RedHat"
-      ansible.builtin.package:
-        name: "{{ scap_package_name[ansible_facts['os_family']] }}"
-        state: "absent"
-        update_cache: true
-        lock_timeout: 300
-
-    - name: Ensure that Scap Security content is removed
-      when:
-        - not (ansible_facts['distribution'] == "RedHat")
-      ansible.builtin.file:
-        path: "{{ tmp_directory }}"
-        state: "absent"
 ...
