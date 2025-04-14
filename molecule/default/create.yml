@@ -101,7 +101,7 @@
             dest: "{{ molecule_instance_config }}"
             mode: "0600"
 
-    - name: Wait for SSH to come up | Use the instance config molecule_instance_config
+    - name: Wait for SSH to come up
       loop: "{{ ec2_instance_info.instances }}"
       ansible.builtin.wait_for:
         host: "{{ item['public_ip_address'] }}"
