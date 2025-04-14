@@ -4,11 +4,35 @@
   become: true
   gather_facts: true
 
+  vars:
+    # File and directory permissions
+    file_owner: "root"
+    file_group: "root"
+    directory_mode: "0755"
+    file_mode: "0644"
+
+    # Temporary directory for storing content
+    tmp_directory: "/var/tmp/cis-benchmark"
+
+    # Scap Security Guide content/package details
+    scap_package_name:
+      RedHat:
+        "8": "scap-security-guide"
+        "9": "scap-security-guide"
+      Amazon:
+        "2023": "scap-security-guide"
+      Ubuntu:
+        "22": "libopenscap8"
+        "24": "openscap-scanner"
+    scap_content_version: "0.1.76"
+    scap_content_file: "scap-security-guide-{{ scap_content_version }}.zip"
+    scap_content_url: "https://github.com/ComplianceAsCode/content/releases/download/v{{ scap_content_version}}/{{ scap_content_file }}"
+
   tasks:
     - name: Ensure that unzip is installed
       ansible.builtin.package:
         name: "unzip"
-        state: "present"
+        state: "latest"
         update_cache: true
         lock_timeout: 300
 
@@ -17,7 +41,41 @@
         - ansible_facts['distribution'] == "Ubuntu"
       ansible.builtin.package:
         name: "python3-venv"
-        state: present
+        state: "latest"
         update_cache: true
         lock_timeout: 300
+
+    - name: Ensure that {{ tmp_directory }} directory exists
+      ansible.builtin.file:
+        path: "{{ tmp_directory }}"
+        state: "directory"
+        owner: "{{ file_owner }}"
+        group: "{{ file_group }}"
+        mode: "{{ directory_mode }}"
+
+    - name: Ensure that Scap Security Guide package is installed
+      ansible.builtin.package:
+        name: "{{ scap_package_name[ansible_facts['distribution']][ansible_facts['distribution_major_version']] }}"
+        state: "latest"
+        update_cache: true
+        lock_timeout: 300
+
+    - name: Ensure that Scap Security content is made available to managed node
+      when:
+        - not (ansible_facts['distribution'] == "RedHat")
+      block:
+        - name: Ensure that Scap Security Guide content is downloaded
+          ansible.builtin.get_url:
+            url: "{{ scap_content_url }}"
+            dest: "{{ tmp_directory }}/{{ scap_content_file }}"
+            owner: "{{ file_owner }}"
+            group: "{{ file_group }}"
+            mode: "{{ file_mode }}"
+
+        - name: Ensure that Scap Security Guide content is extracted
+          ansible.builtin.unarchive:
+            src: "{{ tmp_directory }}/{{ scap_content_file }}"
+            dest: "{{ tmp_directory }}/"
+            remote_src: true
+            extra_opts: [-q]
 ...
