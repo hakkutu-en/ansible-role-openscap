@@ -65,7 +65,7 @@
     - name: Hack | The below is not running as intended (WIll be fixed)
       ansible.builtin.pause:
         prompt: "Waiting for instances to get assigned public IP addresses"
-        seconds: 15
+        minutes: 2
 
     - name: Retrieve information for instances
       loop: "{{ server.results }}"
