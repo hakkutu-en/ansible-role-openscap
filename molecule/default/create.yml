@@ -62,17 +62,10 @@
           Name: "{{ item.name }}"
           DefaultUser: "{{ item.ssh_username }}" # will fix later
 
-    - name: Hack | The below is not running as intended (WIll be fixed)
-      ansible.builtin.pause:
-        prompt: "Waiting for instances to get assigned public IP addresses"
-        minutes: 2
-
     - name: Retrieve information for instances
-      loop: "{{ server.results }}"
       register: ec2_instance_info
       until: >
-        ec2_instance_info.instances[0].public_ip_address is defined and
-        ec2_instance_info.instances[0].private_ip_address is defined
+        ec2_instance_info.instances | map(attribute='public_ip_address') | select('defined') | list | length == ec2_instance_info.instances | length
       retries: 20
       delay: 15
       amazon.aws.ec2_instance_info:
@@ -84,13 +77,14 @@
     - name: Create instance config
       block:
         - name: Populate instance config dict
-          loop: "{{ server.results }}"
+          loop: "{{ ec2_instance_info.instances }}"
           register: instance_config_dict
           ansible.builtin.set_fact:
             instance_conf_dict:
-              instance: "{{ item.instances[0].tags.Name }}"
-              address: "{{ item.instances[0].public_ip_address }}"
-              user: "{{ item.instances[0].tags.DefaultUser }}"
+              instance: "{{ item['tags']['Name'] }}"
+              instance_id: "{{ item['instance_id'] }}"
+              address: "{{ item['public_ip_address'] }}"
+              user: "{{ item['tags']['DefaultUser'] }}"
               port: "{{ ssh_default_port }}"
               identity_file: "{{ molecule_ephemeral_directory }}/{{ keypair_name }}"
 
@@ -106,4 +100,13 @@
               {{ instance_conf | to_json | from_json | to_yaml }}
             dest: "{{ molecule_instance_config }}"
             mode: "0600"
+
+    - name: Wait for SSH to come up | Use the instance config molecule_instance_config
+      loop: "{{ ec2_instance_info.instances }}"
+      ansible.builtin.wait_for:
+        host: "{{ item['public_ip_address'] }}"
+        port: "{{ ssh_default_port }}"
+        delay: 15
+        timeout: 300
+        state: "started"
 ...
