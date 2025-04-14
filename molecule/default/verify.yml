@@ -1,0 +1,73 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  become: true
+
+  vars:
+    # Temporary directory for storing content
+    tmp_directory: "/var/tmp/cis-benchmark"
+
+    # Scap Security Guide content/package details
+    scap_content_version: "0.1.76"
+    scap_content_file: "scap-security-guide-{{ scap_content_version }}.zip"
+
+    # Playbook run parameters
+    scap_input_file_params:
+      RedHat:
+        content_base_directory: "/usr/share/xml/scap/ssg/content"
+        profile: "cis"
+        input_file:
+          "8": "ssg-rhel8-ds.xml"
+          "9": "ssg-rhel9-ds.xml"
+      Amazon:
+        content_base_directory: "{{ tmp_directory }}/{{ scap_content_file | splitext | first }}"
+        profile: "cis"
+        input_file:
+          "2023": "ssg-al2023-ds.xml"
+      Ubuntu:
+        content_base_directory: "{{ tmp_directory }}/{{ scap_content_file | splitext | first }}"
+        profile: "cis_level2_server"
+        input_file:
+          "22": "ssg-ubuntu2204-ds.xml"
+          "24": "ssg-ubuntu2404-ds.xml"
+
+    # Compliance percentage required
+    compliance_percentage_required: 45
+
+  tasks:
+    - name: Ensure that the input file fact is set
+      ansible.builtin.set_fact:
+        xml_input_file: "{{ scap_input_file_params[ansible_facts['distribution']]['content_base_directory'] }}/{{ scap_input_file_params[ansible_facts['distribution']]['input_file'][ansible_facts['distribution_major_version']] }}"
+
+    - name: Execute scap to generate report
+      ignore_errors: true
+      ansible.builtin.command:
+        chdir: "{{ tmp_directory }}"
+        cmd: >
+          oscap xccdf eval
+           --profile {{ scap_input_file_params[ansible_facts['distribution']]['profile'] }}
+           --report {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-report.html
+           {{ xml_input_file }}
+
+    - name: Retrieve the compliance percentage from managed nodes
+      register: compliance_percentage
+      changed_when: false
+      ansible.builtin.shell:
+        chdir: "{{ tmp_directory }}"
+        cmd: >
+          grep -E -o ".{0,6}%<" {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-report.html | tr -d "<",">","%",'"' | tr -d " "
+
+    - name: Verify if compliance percentage is above {{ compliance_percentage_required }}%
+      ansible.builtin.assert:
+        that:
+          - "compliance_percentage['stdout'] is version(compliance_percentage_required, '>=')"
+        fail_msg: |
+          The compliance percentage is below {{ compliance_percentage_required }}%.
+          Current compliance percentage is {{ compliance_percentage['stdout'] }}%.
+          Required compliance percentage is {{ compliance_percentage_required }}%.
+        success_msg: |
+          The compliance percentage has passed.
+          Current compliance percentage is {{ compliance_percentage['stdout'] }}%.
+          Required compliance percentage is {{ compliance_percentage_required }}%.
+...
