@@ -62,6 +62,11 @@
           Name: "{{ item.name }}"
           DefaultUser: "{{ item.ssh_username }}" # will fix later
 
+    - name: Hack | The below is not running as intended (WIll be fixed)
+      ansible.builtin.pause:
+        prompt: "Waiting for instances to get assigned public IP addresses"
+        seconds: 15
+
     - name: Retrieve information for instances
       loop: "{{ server.results }}"
       register: ec2_instance_info
