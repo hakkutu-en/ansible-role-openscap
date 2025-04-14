@@ -59,6 +59,10 @@
     virtualenv_command: "python3 -m venv"
 
 - name: Ensure that the needed Ansible collections are installed
+  changed_when:
+    - ansible_collections_install['rc'] != 0
+    - '"Starting galaxy collection install process\nNothing to do." not in ansible_collections_install["stdout"]'
+  register: ansible_collections_install
   ansible.builtin.shell:
     chdir: "{{ tmp_directory }}"
     cmd: |
@@ -66,6 +70,7 @@
       ansible-galaxy collection install -r collections_requirements.yml
 
 - name: Ensure that the scap playbook is executed
+  changed_when: false
   register: playbook_run_output
   ansible.builtin.shell:
     chdir: "{{ tmp_directory }}"
