@@ -38,4 +38,14 @@ platforms:
     ebs_device_name: "/dev/sda1"
     ebs_volume_size: 30
     ssh_username: "ubuntu"
+provisioner:
+  name: "ansible"
+  playbooks:
+    create: "create.yml"
+    prepare: "prepare.yml"
+    converge: "converge.yml"
+    verify: "verify.yml"
+    destroy: "destroy.yml"
+  env:
+    ANSIBLE_ROLES_PATH: "~/.ansible/roles"
 ...
