@@ -13,7 +13,8 @@
   tasks:
     - name: Ensure that instances are destroyed
       loop: "{{ molecule_yml.platforms }}"
-      register: server
+      notify:
+        - Cleanup resources
       amazon.aws.ec2_instance:
         name: "{{ item.name }}"
         state: absent
@@ -21,32 +22,37 @@
         wait: true
         wait_timeout: 600
 
-    - name: Ensure that all the other resources are destroyed
-      when:
-        - server.changed | default(false) | bool
-      block:
-        - name: Ensure that a security group is deleted
-          amazon.aws.ec2_security_group:
-            name: "{{ security_group_name }}"
-            state: absent
-            region: "{{ aws_region }}"
+  handlers:
+    - name: Ensure that a security group is deleted
+      listen:
+        - Cleanup resources
+      amazon.aws.ec2_security_group:
+        name: "{{ security_group_name }}"
+        state: absent
+        region: "{{ aws_region }}"
 
-        - name: Ensure that an AWS keypair is deleted
-          amazon.aws.ec2_key:
-            name: "{{ keypair_name }}"
-            state: absent
-            region: "{{ aws_region }}"
+    - name: Ensure that an AWS keypair is deleted
+      listen:
+        - Cleanup resources
+      amazon.aws.ec2_key:
+        name: "{{ keypair_name }}"
+        state: absent
+        region: "{{ aws_region }}"
 
-        - name: Populate instance config
-          ansible.builtin.set_fact:
-            instance_conf: {}
+    - name: Populate instance config
+      listen:
+        - Cleanup resources
+      ansible.builtin.set_fact:
+        instance_conf: {}
 
-        - name: Dump instance config
-          ansible.builtin.copy:
-            content: |
-              # Molecule managed
+    - name: Dump instance config
+      listen:
+        - Cleanup resources
+      ansible.builtin.copy:
+        content: |
+          # Molecule managed
 
-              {{ instance_conf | to_json | from_json | to_yaml }}
-            dest: "{{ molecule_instance_config }}"
-            mode: "0600"
+          {{ instance_conf | to_json | from_json | to_yaml }}
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"
 ...
