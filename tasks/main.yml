@@ -12,7 +12,7 @@
     - ansible_facts['distribution'] == "RedHat"
   ansible.builtin.package:
     name: "{{ scap_package_name[ansible_facts['os_family']] }}"
-    state: "latest"
+    state: "present"
     update_cache: true
     lock_timeout: 300
 
@@ -54,7 +54,7 @@
 - name: Ensure that ansible-core is installed in the virtual environment
   ansible.builtin.pip:
     name: "ansible-core"
-    state: "latest"
+    state: "present"
     virtualenv: "{{ tmp_directory }}/openscap"
     virtualenv_command: "python3 -m venv"
 

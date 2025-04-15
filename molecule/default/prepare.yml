@@ -32,7 +32,7 @@
     - name: Ensure that unzip is installed
       ansible.builtin.package:
         name: "unzip"
-        state: "latest"
+        state: "present"
         update_cache: true
         lock_timeout: 300
 
@@ -41,7 +41,7 @@
         - ansible_facts['distribution'] == "Ubuntu"
       ansible.builtin.package:
         name: "python3-venv"
-        state: "latest"
+        state: "present"
         update_cache: true
         lock_timeout: 300
 
@@ -56,7 +56,7 @@
     - name: Ensure that Scap Security Guide package is installed
       ansible.builtin.package:
         name: "{{ scap_package_name[ansible_facts['distribution']][ansible_facts['distribution_major_version']] }}"
-        state: "latest"
+        state: "present"
         update_cache: true
         lock_timeout: 300
 
