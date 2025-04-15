@@ -14,7 +14,7 @@ scap_package_name:
   Debian: "libopenscap8"
 scap_content_version: "0.1.76"
 scap_content_file: "scap-security-guide-{{ scap_content_version }}.zip"
-scap_content_url: "https://github.com/ComplianceAsCode/content/releases/download/v{{ scap_content_version}}/{{ scap_content_file }}"
+scap_content_url: "https://github.com/ComplianceAsCode/content/releases/download/v{{ scap_content_version }}/{{ scap_content_file }}"
 
 # Playbook run parameters
 sudoers_base_directory: "/etc/sudoers.d"
