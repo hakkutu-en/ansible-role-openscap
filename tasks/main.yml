@@ -69,6 +69,11 @@
       . openscap/bin/activate
       ansible-galaxy collection install -r collections_requirements.yml
 
+- name: Ensure that the playbook full path is set
+  ansible.builtin.set_fact:
+    playbook_base_path: "{{ scap_execution_parameters[ansible_facts['distribution']]['content_base_directory'] }}"
+    playbook_name_part: "{{ scap_execution_parameters[ansible_facts['distribution']]['playbook_name'][ansible_facts['distribution_major_version']] }}"
+
 - name: Ensure that the scap playbook is executed
   changed_when: false
   register: playbook_run_output
@@ -76,7 +81,8 @@
     chdir: "{{ tmp_directory }}"
     cmd: |
       . openscap/bin/activate
-      ansible-playbook -i localhost, -c local {{ scap_execution_parameters[ansible_facts['distribution']]['content_base_directory'] }}/{{ scap_execution_parameters[ansible_facts['distribution']]['playbook_name'][ansible_facts['distribution_major_version']] }}
+      ansible-playbook -i localhost, -c local \
+      {{ playbook_base_path }}/{{ playbook_name_part }}
 
       chmod +w {{ sudoers_base_directory }}/{{ sudoers_filename }}
       sed -i 's/^# {{ ansible_user }}/{{ ansible_user }}/' {{ sudoers_base_directory }}/{{ sudoers_filename }}
