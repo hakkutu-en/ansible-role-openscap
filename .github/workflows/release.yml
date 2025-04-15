@@ -1,3 +1,38 @@
 ---
+name: Molecule CI/CD
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - "**"
+  merge_group:
+  schedule:
+    - cron: "0 0 * * *" # Every day at midnight
+  workflow_dispatch:
 
+jobs:
+  ansible-lint:
+    name: Ansible Lint
+    runs-on: ""
+
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Ansible Core and Ansible Lint
+        run: |
+          pip3 install -r .github/workflows/requirements/requirements_ansible_lint.txt
+
+      - name: Run Ansible Lint
+        run: |
+          ansible-lint --force-color --skip-list ignore-errors
 ...
