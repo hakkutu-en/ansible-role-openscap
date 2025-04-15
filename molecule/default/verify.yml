@@ -36,9 +36,10 @@
     compliance_percentage_required: 45
 
   tasks:
-    - name: Ensure that the input file fact is set
+    - name: Ensure that the input file facts are set
       ansible.builtin.set_fact:
-        xml_input_file: "{{ scap_input_file_params[ansible_facts['distribution']]['content_base_directory'] }}/{{ scap_input_file_params[ansible_facts['distribution']]['input_file'][ansible_facts['distribution_major_version']] }}"
+        xml_base_directory: "{{ scap_input_file_params[ansible_facts['distribution']]['content_base_directory'] }}"
+        xml_name_part: "{{ scap_input_file_params[ansible_facts['distribution']]['input_file'][ansible_facts['distribution_major_version']] }}"
 
     - name: Execute scap to generate report
       ignore_errors: true
@@ -48,7 +49,7 @@
           oscap xccdf eval
            --profile {{ scap_input_file_params[ansible_facts['distribution']]['profile'] }}
            --report {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-report.html
-           {{ xml_input_file }}
+           {{ xml_base_directory }}/{{ xml_name_part }}
 
     - name: Retrieve the compliance percentage from managed nodes
       register: compliance_percentage
