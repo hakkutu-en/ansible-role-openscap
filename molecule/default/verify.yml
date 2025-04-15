@@ -41,8 +41,9 @@
         xml_base_directory: "{{ scap_input_file_params[ansible_facts['distribution']]['content_base_directory'] }}"
         xml_name_part: "{{ scap_input_file_params[ansible_facts['distribution']]['input_file'][ansible_facts['distribution_major_version']] }}"
 
-    - name: Execute scap to generate report
-      ignore_errors: true
+    - name: Ensure scap report is generated
+      ignore_errors: true # Lint failure - ignore-errors; wil fix later
+      changed_when: false # Lint failure - no-changed-when
       ansible.builtin.command:
         chdir: "{{ tmp_directory }}"
         cmd: >
@@ -51,13 +52,17 @@
            --report {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-report.html
            {{ xml_base_directory }}/{{ xml_name_part }}
 
+    - name: Ensure that report file name is set
+      ansible.builtin.set_fact:
+        report_file_name: "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-report.html"
+
     - name: Retrieve the compliance percentage from managed nodes
       register: compliance_percentage
       changed_when: false
       ansible.builtin.shell:
         chdir: "{{ tmp_directory }}"
         cmd: >
-          grep -E -o ".{0,6}%<" {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-report.html | tr -d "<",">","%",'"' | tr -d " "
+          set -o pipefail && grep -E -o ".{0,6}%<" {{ report_file_name }} | tr -d "<",">","%",'"' | tr -d " "
 
     - name: Verify if compliance percentage is above {{ compliance_percentage_required }}%
       ansible.builtin.assert:
