@@ -76,7 +76,9 @@
 
 - name: Ensure that the scap playbook is executed
   changed_when: false
-  register: playbook_run_output
+  register: playbook_run
+  async: 3600
+  poll: 0
   ansible.builtin.shell:
     chdir: "{{ tmp_directory }}"
     cmd: |
@@ -87,4 +89,12 @@
       chmod +w {{ sudoers_base_directory }}/{{ sudoers_filename }}
       sed -i 's/^# {{ ansible_user }}/{{ ansible_user }}/' {{ sudoers_base_directory }}/{{ sudoers_filename }}
       chmod -w {{ sudoers_base_directory }}/{{ sudoers_filename }}
+
+- name: Poll for scap playbook execution completion
+  register: playbook_run_status
+  retries: 60
+  delay: 60
+  until: playbook_run_status.finished
+  ansible.builtin.async_status:
+    jid: "{{ playbook_run.ansible_job_id }}"
 ...
