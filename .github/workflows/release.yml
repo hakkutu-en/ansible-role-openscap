@@ -1,5 +1,5 @@
 ---
-name: Molecule CI/CD
+name: Ansible Role (openscap) Molecule Tests
 on:
   pull_request:
     branches:
@@ -68,5 +68,4 @@ jobs:
             ANSIBLE_FORCE_COLOR: 1
           run: |
             molecule test
-
 ...
