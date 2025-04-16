@@ -38,7 +38,7 @@ jobs:
 
       - name: Run Ansible Lint
         run: |
-          ansible-lint --force-color --skip-list ignore-errors
+          ansible-lint --force-color
 
   molecule:
       name: Molecule Tests
