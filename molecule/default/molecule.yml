@@ -44,7 +44,7 @@ provisioner:
     defaults:
       callbacks_enabled: "ansible.posix.profile_tasks, ansible.posix.timer"
   connection_options:
-    ansible_ssh_common_args: "-o ControlPersist=300s"
+    ansible_ssh_common_args: "-o ConnectTimeout=60 -o ControlPersist=300s"
   playbooks:
     create: "create.yml"
     prepare: "prepare.yml"
