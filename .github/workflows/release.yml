@@ -11,7 +11,7 @@ on:
       - "**"
   merge_group:
   schedule:
-    - cron: "0 0 * * *" # Every day at midnight
+    - cron: "15 0 * * *" # From GitHub, events may be delayed at the hour, adviseable to run at specific time after the hour
   workflow_dispatch:
 
 jobs:
@@ -39,4 +39,34 @@ jobs:
       - name: Run Ansible Lint
         run: |
           ansible-lint --force-color --skip-list ignore-errors
+
+  molecule:
+      name: Molecule Tests
+      runs-on: "ubuntu-latest"
+      needs: ansible-lint
+
+      steps:
+        - name: Check out the codebase
+          uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.13"
+
+        - name: Install Ansible Core and Molecule
+          run: |
+            pip3 install -r .github/workflows/requirements/requirements_molecule.txt
+
+        - name: Install Ansible Core collection dependencies
+          run: |
+            ansible-galaxy collection install -r .github/workflows/requirements/requirements_collections.yml
+
+        - name: Run Molecule tests
+          env:
+            PY_COLORS: 1
+            ANSIBLE_FORCE_COLOR: 1
+          run: |
+            molecule test
+
 ...
