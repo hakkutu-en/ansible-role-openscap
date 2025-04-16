@@ -61,8 +61,10 @@
       changed_when: false
       ansible.builtin.shell:
         chdir: "{{ tmp_directory }}"
-        cmd: >
-          set -o pipefail && grep -E -o ".{0,6}%<" {{ report_file_name }} | tr -d "<",">","%",'"' | tr -d " "
+        executable: "/bin/bash"
+        cmd: |
+          set -o pipefail
+          grep -E -o ".{0,6}%<" {{ report_file_name }} | tr -d "<",">","%",'"' | tr -d " "
 
     - name: Verify if compliance percentage is above {{ compliance_percentage_required }}%
       ansible.builtin.assert:
