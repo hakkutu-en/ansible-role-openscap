@@ -12,11 +12,10 @@
 
   tasks:
     - name: Ensure that instances are destroyed
-      loop: "{{ molecule_yml.platforms }}"
       notify:
         - Cleanup resources
       amazon.aws.ec2_instance:
-        name: "{{ item.name }}"
+        name: "afs1-hakkutu-dev-ansible-role-openscap-*"
         state: absent
         region: "{{ aws_region }}"
         wait: true
