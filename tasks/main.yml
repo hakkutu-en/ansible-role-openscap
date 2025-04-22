@@ -84,7 +84,8 @@
     cmd: |
       . openscap/bin/activate
       ansible-playbook -i localhost, -c local \
-      {{ playbook_base_path }}/{{ playbook_name_part }}
+      {{ playbook_base_path }}/{{ playbook_name_part }} \
+      --skip-tags sudo_require_authentication
 
       chmod +w {{ sudoers_base_directory }}/{{ sudoers_filename }}
       sed -i 's/^# {{ ansible_user }}/{{ ansible_user }}/' {{ sudoers_base_directory }}/{{ sudoers_filename }}
