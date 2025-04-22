@@ -79,6 +79,7 @@
         - name: Populate instance config dict
           loop: "{{ ec2_instance_info.instances }}"
           register: instance_config_dict
+          no_log: true
           ansible.builtin.set_fact:
             instance_conf_dict:
               instance: "{{ item['tags']['Name'] }}"
@@ -93,6 +94,7 @@
             instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
 
         - name: Dump instance config
+          no_log: true
           ansible.builtin.copy:
             content: |
               # Molecule managed
