@@ -87,10 +87,6 @@
       {{ playbook_base_path }}/{{ playbook_name_part }} \
       --skip-tags sudo_require_authentication
 
-      chmod +w {{ sudoers_base_directory }}/{{ sudoers_filename }}
-      sed -i 's/^# {{ ansible_user }}/{{ ansible_user }}/' {{ sudoers_base_directory }}/{{ sudoers_filename }}
-      chmod -w {{ sudoers_base_directory }}/{{ sudoers_filename }}
-
 - name: Poll for scap playbook execution completion
   register: playbook_run_status
   retries: 60
