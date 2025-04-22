@@ -82,10 +82,29 @@
   ansible.builtin.shell:
     chdir: "{{ tmp_directory }}"
     cmd: |
-      . openscap/bin/activate
-      ansible-playbook -i localhost, -c local \
-      {{ playbook_base_path }}/{{ playbook_name_part }} \
-      --skip-tags sudo_require_authentication,wireless_disable_interfaces
+      OS_FAMILY={{ ansible_facts['os_family'] }}
+
+      if [ "${OS_FAMILY}" == "RedHat" ]; then
+        . openscap/bin/activate
+        ansible-playbook -i localhost, -c local \
+        {{ playbook_base_path }}/{{ playbook_name_part }} \
+        --skip-tags sudo_require_authentication
+      else
+        bash {{ playbook_base_path }}/{{ playbook_name_part }}
+
+        SUDO_FILE={{ sudoers_base_directory }}/{{ sudoers_filename }}
+
+        if [ ! -f "${SUDO_FILE}" ]; then
+          echo "File ${SUDO_FILE} does not exist. Creating it..."
+          echo "{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL" > ${SUDO_FILE}
+          chmod -w ${SUDO_FILE}
+        else
+          echo "File ${SUDO_FILE} already exists. Updating it..."
+          chmod +w ${SUDO_FILE}
+          sed -i 's/^# {{ ansible_user }}/{{ ansible_user }}/' ${SUDO_FILE}
+          chmod -w ${SUDO_FILE}
+        fi
+      fi
 
 - name: Poll for scap playbook execution completion
   register: playbook_run_status
