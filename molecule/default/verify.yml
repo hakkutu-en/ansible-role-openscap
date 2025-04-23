@@ -49,12 +49,12 @@
         cmd: >
           oscap xccdf eval
            --profile {{ scap_input_file_params[ansible_facts['distribution']]['profile'] }}
-           --report {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-report.html
+           --report {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}-report.html
            {{ xml_base_directory }}/{{ xml_name_part }}
 
     - name: Ensure that report file name is set
       ansible.builtin.set_fact:
-        report_file_name: "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}-report.html"
+        report_file_name: "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}-report.html"
 
     - name: Retrieve the compliance percentage from managed nodes
       register: compliance_percentage
