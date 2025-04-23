@@ -57,15 +57,11 @@ This role has multiple variables, the defaults variables are found at **[`defaul
 
 |Name|Description|
 |----|-----------|
-|||
+|[`file_owner`](/defaults/main.yml#L4)|The owner of the downloaded content|
 
 ## Dependencies
 
 None
-
-## Known Issues
-
-TBC
 
 ## License
 
