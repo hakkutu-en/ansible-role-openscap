@@ -57,7 +57,10 @@ This role has multiple variables, the defaults variables are found at **[`defaul
 
 |Name|Description|
 |----|-----------|
-|[`file_owner`](/defaults/main.yml#L4)|The owner of the downloaded content|
+|[`file_owner`](/defaults/main.yml#L3)|The owning user of role content|
+|[`file_group`](/defaults/main.yml#L4)|The owning group of role content|
+|[`directory_mode`](/defaults/main.yml#L5)|Permission set for directories|
+|[`file_mode`](/defaults/main.yml#L6)|Permission set for files|
 
 ## Dependencies
 
