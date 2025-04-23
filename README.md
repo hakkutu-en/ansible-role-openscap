@@ -61,6 +61,14 @@ This role has multiple variables, the defaults variables are found at **[`defaul
 |[`file_group`](/defaults/main.yml#L4)|The owning group of role content|
 |[`directory_mode`](/defaults/main.yml#L5)|Permission set for directories|
 |[`file_mode`](/defaults/main.yml#L6)|Permission set for files|
+|[`tmp_directory`](/defaults/main.yml#L9)|User specifc temporary directory|
+|[`scap_package_name`](/defaults/main.yml#L12)|Name of scap package based on OS Family|
+|[`scap_content_version`](/defaults/main.yml#L15)|The release version for [ComplianceAsCode](https://github.com/ComplianceAsCode/content) content|
+|[`scap_content_file`](/defaults/main.yml#L16)|The release assest file name from [ComplianceAsCode](https://github.com/ComplianceAsCode/content/releases)|
+|[`scap_content_url`](/defaults/main.yml#L17)|The URL markup for downloading [ComplianceAsCode](https://github.com/ComplianceAsCode/content/) content|
+|[`sudoers_base_directory`](/defaults/main.yml#L20)|The base directory where sudoers file is located|
+|[`sudoers_filename`](/defaults/main.yml#L21)|The file name for sudo configuration|
+|[`scap_execution_parameters`](/defaults/main.yml#L22)|The SCAP parameters used to run the script or playbook for application|
 
 ## Dependencies
 
