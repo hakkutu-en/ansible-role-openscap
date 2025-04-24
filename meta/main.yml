@@ -7,7 +7,7 @@ galaxy_info:
   description: "CIS Benchmark Server Level  2 hardening"
   license: "license (MIT)"
 
-  min_ansible_version: "[core 2.16.14]"
+  min_ansible_version: "2.16.14"
 
   platforms:
     - name: "EL"
