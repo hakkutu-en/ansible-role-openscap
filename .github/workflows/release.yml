@@ -1,5 +1,5 @@
 ---
-name: Molecule Tests Workflow
+name: Molecule CI/CD
 on:
   pull_request:
     branches:
