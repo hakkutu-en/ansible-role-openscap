@@ -1,5 +1,5 @@
 ---
-name: Ansible Role (openscap) Molecule Tests
+name: Molecule Tests Workflow
 on:
   pull_request:
     branches:
