@@ -1,0 +1,37 @@
+---
+# File and directory permissions
+file_owner: "root"
+file_group: "root"
+directory_mode: "0755"
+file_mode: "0644"
+
+# Temporary directory for storing content
+tmp_directory: "/var/tmp/cis-benchmark"
+
+# Scap Security Guide content/package details
+scap_package_name:
+  RedHat: "scap-security-guide"
+  Debian: "libopenscap8"
+scap_content_version: "0.1.76"
+scap_content_file: "scap-security-guide-{{ scap_content_version }}.zip"
+scap_content_url: "https://github.com/ComplianceAsCode/content/releases/download/v{{ scap_content_version }}/{{ scap_content_file }}"
+
+# Playbook run parameters
+sudoers_base_directory: "/etc/sudoers.d"
+sudoers_filename: "90-cloud-init-users"
+scap_execution_parameters:
+  RedHat:
+    content_base_directory: "/usr/share/scap-security-guide/ansible"
+    playbook_name:
+      "8": "rhel8-playbook-cis.yml"
+      "9": "rhel9-playbook-cis.yml"
+  Amazon:
+    content_base_directory: "{{ tmp_directory }}/{{ scap_content_file | splitext | first }}/ansible"
+    playbook_name:
+      "2023": "al2023-playbook-cis.yml"
+  Ubuntu:
+    content_base_directory: "{{ tmp_directory }}/{{ scap_content_file | splitext | first }}/bash"
+    playbook_name:
+      "22": "ubuntu2204-script-cis_level2_server.sh"
+      "24": "ubuntu2404-script-cis_level2_server.sh"
+...

@@ -1,0 +1,105 @@
+---
+- name: Ensure that temp directory exists - {{ tmp_directory }}
+  ansible.builtin.file:
+    path: "{{ tmp_directory }}"
+    state: "directory"
+    owner: "{{ file_owner }}"
+    group: "{{ file_group }}"
+    mode: "{{ directory_mode }}"
+
+- name: Ensure that Scap Security Guide package is installed
+  when:
+    - ansible_facts['distribution'] == "RedHat"
+  ansible.builtin.package:
+    name: "{{ scap_package_name[ansible_facts['os_family']] }}"
+    state: "present"
+    update_cache: true
+    lock_timeout: 300
+
+- name: Ensure that Scap Security content is made available to managed node
+  when:
+    - not (ansible_facts['distribution'] == "RedHat")
+  block:
+    - name: Ensure that Scap Security Guide content is downloaded
+      ansible.builtin.get_url:
+        url: "{{ scap_content_url }}"
+        dest: "{{ tmp_directory }}/{{ scap_content_file }}"
+        owner: "{{ file_owner }}"
+        group: "{{ file_group }}"
+        mode: "{{ file_mode }}"
+
+    - name: Ensure that Scap Security Guide content is extracted
+      ansible.builtin.unarchive:
+        src: "{{ tmp_directory }}/{{ scap_content_file }}"
+        dest: "{{ tmp_directory }}/"
+        remote_src: true
+        extra_opts: [-q]
+
+- name: Ensure that Ansible configuration file is copied
+  ansible.builtin.copy:
+    src: "ansible.cfg"
+    dest: "{{ tmp_directory }}/ansible.cfg"
+    owner: "{{ file_owner }}"
+    group: "{{ file_group }}"
+    mode: "{{ file_mode }}"
+
+- name: Ensure that Ansible collection requirements file is copied
+  ansible.builtin.copy:
+    src: "requirements/{{ ansible_facts['distribution'] }}_{{ ansible_facts['distribution_major_version'] }}.yml"
+    dest: "{{ tmp_directory }}/collections_requirements.yml"
+    owner: "{{ file_owner }}"
+    group: "{{ file_group }}"
+    mode: "{{ file_mode }}"
+
+- name: Ensure that ansible-core is installed in the virtual environment
+  ansible.builtin.pip:
+    name: "ansible-core"
+    state: "present"
+    virtualenv: "{{ tmp_directory }}/openscap"
+    virtualenv_command: "python3 -m venv"
+
+- name: Ensure that the needed Ansible collections are installed
+  changed_when:
+    - ansible_collections_install['rc'] != 0
+    - '"Starting galaxy collection install process\nNothing to do." not in ansible_collections_install["stdout"]'
+  register: ansible_collections_install
+  ansible.builtin.shell:
+    chdir: "{{ tmp_directory }}"
+    cmd: |
+      . openscap/bin/activate
+      ansible-galaxy collection install -r collections_requirements.yml
+
+- name: Ensure that the playbook full path is set
+  ansible.builtin.set_fact:
+    playbook_base_path: "{{ scap_execution_parameters[ansible_facts['distribution']]['content_base_directory'] }}"
+    playbook_name_part: "{{ scap_execution_parameters[ansible_facts['distribution']]['playbook_name'][ansible_facts['distribution_major_version']] }}"
+
+- name: Ensure that the scap playbook is executed
+  changed_when: false
+  register: playbook_run
+  async: 3600
+  poll: 0
+  ansible.builtin.shell:
+    chdir: "{{ tmp_directory }}"
+    cmd: |
+      OS_FAMILY={{ ansible_facts['os_family'] }}
+
+      if [ "${OS_FAMILY}" == "RedHat" ]; then
+        . openscap/bin/activate
+        ansible-playbook -i localhost, -c local \
+        {{ playbook_base_path }}/{{ playbook_name_part }} \
+        --skip-tags sudo_require_authentication
+      else
+        awk '/.*content_rule_sudo_remove_no_authenticate/{flag=1} /# END.*content_rule_sudo_require_reauthentication/{flag=0} flag{print "#" $0; next} 1' \
+        {{ playbook_base_path }}/{{ playbook_name_part }} > playbook{{ ansible_facts['distribution_major_version'] }}.sh
+        bash playbook{{ ansible_facts['distribution_major_version'] }}.sh
+      fi
+
+- name: Poll for scap playbook execution completion
+  register: playbook_run_status
+  retries: 60
+  delay: 60
+  until: playbook_run_status.finished
+  ansible.builtin.async_status:
+    jid: "{{ playbook_run.ansible_job_id }}"
+...

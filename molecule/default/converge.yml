@@ -1,0 +1,11 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Process ansible_role_openscap role
+      ansible.builtin.include_role:
+        name: "hakkutu-en.openscap"
+...
