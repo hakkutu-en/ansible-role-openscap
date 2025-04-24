@@ -1,3 +1,9 @@
+[![Molecule CI/CD](https://github.com/hakkutu-en/ansible-role-openscap/actions/workflows/molecule.yml/badge.svg)](https://github.com/hakkutu-en/ansible-role-openscap/actions/workflows/molecule.yml)
+[![Ansible Galaxy Role Import](https://github.com/hakkutu-en/ansible-role-openscap/actions/workflows/galaxy.yml/badge.svg)](https://github.com/hakkutu-en/ansible-role-openscap/actions/workflows/galaxy.yml)
+[![Community Support](https://badgen.net/badge/support/community/cyan?icon=awesome)](/SUPPORT.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
+
 # Ansible Role: OpenSCAP
 
 This role applies the [CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks) Server Level 2 recommendations on RedHat, Amazon Linux and Ubuntu on your target host(s).
