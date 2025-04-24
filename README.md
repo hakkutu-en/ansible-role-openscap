@@ -7,7 +7,11 @@ This role applies the [CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks
 
 ## Requirements
 
-TBC
+If you want to use this role, you will need to use a supported version of Ansible Core. Ansible Lint and Ansible Molecule are used if you want to contribute to this role.
+
+* This role is developed and tested with [maintained](https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintenance.html) versions of Ansible core and Python.
+* [Ansible Lint](https://ansible.readthedocs.io/projects/lint/installing/) is used to lint the role for both Ansible best practices and potential Ansible/YAML issues.
+* [Ansible Molecule](https://molecule.readthedocs.io/en/latest/installation.html) is used to test the various functionalities of the role.
 
 ## Role Installation
 
