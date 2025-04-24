@@ -20,19 +20,19 @@ Follow the role's [installation guide](/README.md#Role-Installation) to install 
 
 ### Report a Bug
 
-To report a bug, open an issue on GitHub with the label `bug` using the available [bug report issue form](/.github/TEMPLATES/bug_report.yml). Please ensure the bug has not already been reported.
+To report a bug, open an issue on GitHub with the label `bug` using the available [bug report issue form](/.github/ISSUE_TEMPLATE/bug_report.yml). Please ensure the bug has not already been reported.
 
 ### Suggest a Feature or Enhancement
 
-To suggest a feature or enhancement, please create an issue on GitHub with the label `enhancement` using the available [feature request issue form](/.github/TEMPLATES/feature_request.yml). Please ensure the feature or enhancement has not already been suggested.
+To suggest a feature or enhancement, please create an issue on GitHub with the label `enhancement` using the available [feature request issue form](/.github/ISSUE_TEMPLATE/feature_request.yml). Please ensure the feature or enhancement has not already been suggested.
 
 ### Open a Pull Request (PR)
 
 - Fork the repo, create a branch, implement your changes, add any relevant tests, and submit a PR when your changes are **tested** (using Molecule) and ready for review.
-- Fill in the [PR template](/.github/TEMPLATES/pull_request.md).
+- Fill in the [PR template](/.github/ISSUE_TEMPLATE/pull_request.md).
 
 > [!NOTE]
-> If you'd like to implement a new feature, please consider creating a [feature request issue](/.github/TEMPLATES/feature_request.yml) first to start a discussion about the feature.
+> If you'd like to implement a new feature, please consider creating a [feature request issue](/.github/ISSUE_TEMPLATE/feature_request.yml) first to start a discussion about the feature.
 
 ## Code Guidelines
 
