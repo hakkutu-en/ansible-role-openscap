@@ -7,5 +7,5 @@
   tasks:
     - name: Process ansible_role_openscap role
       ansible.builtin.include_role:
-        name: "hakkutu-en.ansible_role_openscap"
+        name: "hakkutu-en.openscap"
 ...
